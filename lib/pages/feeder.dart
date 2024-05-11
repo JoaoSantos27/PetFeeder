@@ -1,6 +1,9 @@
-class Feeder {
-  final String name;
-  final String description;
+import 'dart:io';
 
-  Feeder(this.name, this.description);
+class Feeder {
+  String name;
+  String description;
+  File? imageFile; // Optional image file
+
+  Feeder(this.name, this.description, this.imageFile);
 }
