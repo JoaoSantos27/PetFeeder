@@ -75,17 +75,17 @@ class _FeederListScreenState extends State<FeederListScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Deletion'),
-          content: Text('Are you sure you want to delete this feeder?'),
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this feeder?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
             ),
             TextButton(
-              child: Text('Delete'),
+              child: const Text('Delete'),
               onPressed: () {
                 setState(() {
                   feeders.remove(feeder); // Delete the feeder
@@ -182,8 +182,8 @@ class _FeederListScreenState extends State<FeederListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddFeederDialog,
-        child: Icon(Icons.add),
         tooltip: 'Add a new feeder',
+        child: const Icon(Icons.add),
       ),
     );
   }
