@@ -135,7 +135,7 @@ class _FeederListScreenState extends State<FeederListScreen> {
                   height: 80, // Adjust the height of the image container
                   child: feeder.imageFile != null
                       ? Image.file(feeder.imageFile!, fit: BoxFit.cover)
-                      : null, // Display photo if available
+                      : Image.asset('assets/images/placeholder.jpg'), // Display photo if available
                 ),
                 title: Text(
                   feeder.name,
