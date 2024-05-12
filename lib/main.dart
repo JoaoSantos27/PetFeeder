@@ -113,7 +113,7 @@ class _FeederListScreenState extends State<FeederListScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green, // Set the background color to green
-        title: Text(
+        title: const Text(
           'Pet Feeders',
           style: TextStyle(
             color: Colors.white, // Set the text color to white
@@ -125,28 +125,28 @@ class _FeederListScreenState extends State<FeederListScreen> {
         itemCount: feeders.length,
         itemBuilder: (BuildContext context, int index) {
           Feeder feeder = feeders[index];
-          return Container(
+          return SizedBox(
               height: 100, // Set a fixed height for each ListTile
               child: ListTile(
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 // Adjust the padding to increase the item size
-                leading: Container(
+                leading: SizedBox(
                   width: 60, // Adjust the width of the image container
-                  height: 60, // Adjust the height of the image container
+                  height: 80, // Adjust the height of the image container
                   child: feeder.imageFile != null
                       ? Image.file(feeder.imageFile!, fit: BoxFit.cover)
                       : null, // Display photo if available
                 ),
                 title: Text(
                   feeder.name,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 18,
                       fontWeight:
                           FontWeight.bold), // Increase font size of the title
                 ),
                 subtitle: Text(
                   feeder.description,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 16), // Increase font size of the subtitle
                 ),
                 onTap: () {
