@@ -63,7 +63,9 @@ class _FeederListScreenState extends State<FeederListScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return EditFeederDialog(feeder: feeder, onEdit: (editedFeeder) => _editFeeder(feeder, editedFeeder));
+        return EditFeederDialog(
+            feeder: feeder,
+            onEdit: (editedFeeder) => _editFeeder(feeder, editedFeeder));
       },
     );
   }
@@ -121,26 +123,61 @@ class _FeederListScreenState extends State<FeederListScreen> {
       ),
       body: ListView.builder(
         itemCount: feeders.length,
-        itemBuilder: (context, index) {
-          final feeder = feeders[index];
-          return ListTile(
-            title: Text(feeder.name),
-            subtitle: Text(feeder.description),
-            onTap: () => _navigateToFeederDetail(feeder),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () => _showEditFeederDialog(feeder),
+        itemBuilder: (BuildContext context, int index) {
+          Feeder feeder = feeders[index];
+          return Container(
+              height: 100, // Set a fixed height for each ListTile
+              child: ListTile(
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                // Adjust the padding to increase the item size
+                leading: Container(
+                  width: 60, // Adjust the width of the image container
+                  height: 60, // Adjust the height of the image container
+                  child: feeder.imageFile != null
+                      ? Image.file(feeder.imageFile!, fit: BoxFit.cover)
+                      : null, // Display photo if available
                 ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => _deleteFeeder(feeder),
+                title: Text(
+                  feeder.name,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight:
+                          FontWeight.bold), // Increase font size of the title
                 ),
-              ],
-            ),
-          );
+                subtitle: Text(
+                  feeder.description,
+                  style: TextStyle(
+                      fontSize: 16), // Increase font size of the subtitle
+                ),
+                onTap: () {
+                  // Handle onTap event for editing the feeder
+                  _navigateToFeederDetail(feeder);
+                },
+                trailing: PopupMenuButton(
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                    PopupMenuItem(
+                      child: ListTile(
+                        leading: const Icon(Icons.edit),
+                        title: const Text('Edit'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _showEditFeederDialog(feeder);
+                        },
+                      ),
+                    ),
+                    PopupMenuItem(
+                      child: ListTile(
+                        leading: const Icon(Icons.delete),
+                        title: const Text('Delete'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _deleteFeeder(feeder);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ));
         },
       ),
       floatingActionButton: FloatingActionButton(

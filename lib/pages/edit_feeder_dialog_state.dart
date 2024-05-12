@@ -15,15 +15,15 @@ class EditFeederDialog extends StatefulWidget {
 }
 
 class _EditFeederDialogState extends State<EditFeederDialog> {
-  late String newName;
-  late String newDescription;
-  File? newImageFile;
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
+  late File? newImageFile;
 
   @override
   void initState() {
     super.initState();
-    newName = widget.feeder.name;
-    newDescription = widget.feeder.description;
+    _nameController = TextEditingController(text: widget.feeder.name);
+    _descriptionController = TextEditingController(text: widget.feeder.description);
     newImageFile = widget.feeder.imageFile;
   }
 
@@ -36,21 +36,21 @@ class _EditFeederDialogState extends State<EditFeederDialog> {
           children: <Widget>[
             TextField(
               decoration: const InputDecoration(labelText: 'Feeder Name'),
+              controller: _nameController,
               onChanged: (value) {
                 setState(() {
-                  newName = value;
+                  widget.feeder.name = value;
                 });
               },
-              controller: TextEditingController(text: widget.feeder.name),
             ),
             TextField(
               decoration: const InputDecoration(labelText: 'Description'),
+              controller: _descriptionController,
               onChanged: (value) {
                 setState(() {
-                  newDescription = value;
+                  widget.feeder.description = value;
                 });
               },
-              controller: TextEditingController(text: widget.feeder.description),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -86,7 +86,7 @@ class _EditFeederDialogState extends State<EditFeederDialog> {
         TextButton(
           child: const Text('Save'),
           onPressed: () {
-            widget.onEdit(Feeder(newName, newDescription, newImageFile));
+            widget.onEdit(Feeder(widget.feeder.name, widget.feeder.description, newImageFile));
             Navigator.of(context).pop();
           },
         ),
