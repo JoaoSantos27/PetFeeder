@@ -1,24 +1,29 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:untitled/pages/add_feeder_dialog_state.dart';
+import 'package:untitled/pages/edit_feeder_dialog_state.dart';
 import 'package:untitled/pages/feeder.dart';
 import 'package:untitled/pages/feeder_detail_screen.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: FeederListScreen(),
     );
   }
 }
 
 class FeederListScreen extends StatefulWidget {
+  const FeederListScreen({super.key});
+
   @override
   _FeederListScreenState createState() => _FeederListScreenState();
 }
@@ -29,138 +34,36 @@ class _FeederListScreenState extends State<FeederListScreen> {
     Feeder('Feeder 2', 'Secondary Feeder in the Kitchen', null),
   ];
 
-  File? _imageFile;
+  void _addFeeder(String name, String description, File? image) {
+    setState(() {
+      feeders.add(Feeder(name, description, image));
+    });
+  }
 
-  void _addFeeder() {
+  void _showAddFeederDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        String feederName = '';
-        String feederDescription = '';
-        return AlertDialog(
-          title: Text('Add Feeder'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                TextField(
-                  decoration: InputDecoration(labelText: 'Feeder Name'),
-                  onChanged: (value) {
-                    feederName = value;
-                  },
-                ),
-                TextField(
-                  decoration: InputDecoration(labelText: 'Description'),
-                  onChanged: (value) {
-                    feederDescription = value;
-                  },
-                ),
-                SizedBox(height: 20),
-                _imageFile == null
-                    ? ElevatedButton(
-                        onPressed: _pickImage,
-                        child: Text('Select Pet Photo'),
-                      )
-                    : Image.file(_imageFile!),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                setState(() {
-                  _imageFile = null; // Reset image file after adding the feeder
-                });
-              },
-            ),
-            TextButton(
-              child: Text('Add'),
-              onPressed: () {
-                setState(() {
-                  feeders
-                      .add(Feeder(feederName, feederDescription, _imageFile));
-                  _imageFile = null; // Reset image file after adding the feeder
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return AddFeederDialog(onAdd: _addFeeder);
       },
     );
   }
 
-  void _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-    }
+  void _editFeeder(Feeder oldFeeder, Feeder editedFeeder) {
+    setState(() {
+      // Find and update the edited feeder in the list
+      final index = feeders.indexOf(oldFeeder);
+      if (index != -1) {
+        feeders[index] = editedFeeder;
+      }
+    });
   }
 
-  void _editFeeder(Feeder feeder) {
-    String newName = feeder.name;
-    String newDescription = feeder.description;
-    File? newImageFile = feeder.imageFile;
-
+  void _showEditFeederDialog(Feeder feeder) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Edit Feeder'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                TextField(
-                  decoration: InputDecoration(labelText: 'Feeder Name'),
-                  onChanged: (value) {
-                    newName = value;
-                  },
-                  controller: TextEditingController(text: feeder.name),
-                ),
-                TextField(
-                  decoration: InputDecoration(labelText: 'Description'),
-                  onChanged: (value) {
-                    newDescription = value;
-                  },
-                  controller: TextEditingController(text: feeder.description),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _pickImage,
-                  child: Text('Select Photo'),
-                ),
-                if (newImageFile != null) Image.file(newImageFile),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                setState(() {
-                  _imageFile = null; // Reset image file after adding the feeder
-                });
-              },
-            ),
-            TextButton(
-              child: Text('Save'),
-              onPressed: () {
-                setState(() {
-                  feeder.name = newName;
-                  feeder.description = newDescription;
-                  feeder.imageFile = _imageFile;
-                  _imageFile = null; // Reset image file after adding the feeder
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return EditFeederDialog(feeder: feeder, onEdit: (editedFeeder) => _editFeeder(feeder, editedFeeder));
       },
     );
   }
@@ -229,7 +132,7 @@ class _FeederListScreenState extends State<FeederListScreen> {
               children: <Widget>[
                 IconButton(
                   icon: Icon(Icons.edit),
-                  onPressed: () => _editFeeder(feeder),
+                  onPressed: () => _showEditFeederDialog(feeder),
                 ),
                 IconButton(
                   icon: Icon(Icons.delete),
@@ -241,7 +144,7 @@ class _FeederListScreenState extends State<FeederListScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addFeeder,
+        onPressed: _showAddFeederDialog,
         child: Icon(Icons.add),
         tooltip: 'Add a new feeder',
       ),
