@@ -128,14 +128,16 @@ class _FeederListScreenState extends State<FeederListScreen> {
           return SizedBox(
               height: 100, // Set a fixed height for each ListTile
               child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 // Adjust the padding to increase the item size
                 leading: SizedBox(
                   width: 60, // Adjust the width of the image container
                   height: 80, // Adjust the height of the image container
                   child: feeder.imageFile != null
                       ? Image.file(feeder.imageFile!, fit: BoxFit.cover)
-                      : Image.asset('assets/images/placeholder.jpg'), // Display photo if available
+                      : Image.asset(
+                          'assets/images/placeholder.jpg'), // Display photo if available
                 ),
                 title: Text(
                   feeder.name,
@@ -183,7 +185,8 @@ class _FeederListScreenState extends State<FeederListScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddFeederDialog,
         tooltip: 'Add a new feeder',
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.green,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
