@@ -30,13 +30,13 @@ class FeederListScreen extends StatefulWidget {
 
 class _FeederListScreenState extends State<FeederListScreen> {
   List<Feeder> feeders = [
-    Feeder('Feeder 1', 'Main Feeder in the Living Room', null),
-    Feeder('Feeder 2', 'Secondary Feeder in the Kitchen', null),
+    Feeder('Feeder 1', 'Main Feeder in the Living Room', null, 1000, 1000),
+    Feeder('Feeder 2', 'Secondary Feeder in the Kitchen', null, 1000, 1000),
   ];
 
-  void _addFeeder(String name, String description, File? image) {
+  void _addFeeder(String name, String description, File? image, int maxFood, int maxWater) {
     setState(() {
-      feeders.add(Feeder(name, description, image));
+      feeders.add(Feeder(name, description, image, maxFood, maxWater));
     });
   }
 

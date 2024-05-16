@@ -10,8 +10,8 @@ class FeederDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Calculate the percentage of food and water remaining
-    double foodPercentage = feeder.foodLevel / Feeder.maxFoodLevel;
-    double waterPercentage = feeder.waterLevel / Feeder.maxWaterLevel;
+    double foodPercentage = feeder.foodLevel / feeder.maxFoodLevel;
+    double waterPercentage = feeder.waterLevel / feeder.maxWaterLevel;
 
     double newTimeInterval = feeder.timeInterval;
     int newFoodAmount = feeder.foodAmount;
@@ -83,12 +83,12 @@ class FeederDetailScreen extends StatelessWidget {
             // Add space between the text and the button
             // Food level indicator
             _buildLevelIndicator(
-                'Food Container Level', foodPercentage, foodColor),
+                'Food Container Level', foodPercentage, foodColor, feeder.maxFoodLevel, 'grams'),
             const SizedBox(height: 10),
             // Add some spacing between the indicators
             // Water level indicator
             _buildLevelIndicator(
-                'Water Container Level', waterPercentage, waterColor),
+                'Water Container Level', waterPercentage, waterColor, feeder.maxWaterLevel, 'mililiters'),
             const SizedBox(height: 20),
             // Add space between the indicators and the button
             // Button to dispense food
@@ -224,13 +224,22 @@ class FeederDetailScreen extends StatelessWidget {
   }
 
   // Helper function to build a level indicator
-  Widget _buildLevelIndicator(String label, double percentage, Color color) {
+  Widget _buildLevelIndicator(String label, double percentage, Color color, int maxLevel, String unit) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Row(
+          children: <Widget>[
+            Text(
+              label,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              '(Max: $maxLevel $unit)',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
         ),
         const SizedBox(height: 5),
         LinearProgressIndicator(

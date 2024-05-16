@@ -17,6 +17,8 @@ class EditFeederDialog extends StatefulWidget {
 class _EditFeederDialogState extends State<EditFeederDialog> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
+  late TextEditingController _maxFood;
+  late TextEditingController _maxWater;
   late File? newImageFile;
 
   @override
@@ -24,6 +26,8 @@ class _EditFeederDialogState extends State<EditFeederDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.feeder.name);
     _descriptionController = TextEditingController(text: widget.feeder.description);
+    _maxFood = TextEditingController(text: widget.feeder.maxFoodLevel.toString());
+    _maxWater = TextEditingController(text: widget.feeder.maxWaterLevel.toString());
     newImageFile = widget.feeder.imageFile;
   }
 
@@ -49,6 +53,24 @@ class _EditFeederDialogState extends State<EditFeederDialog> {
               onChanged: (value) {
                 setState(() {
                   widget.feeder.description = value;
+                });
+              },
+            ),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Food container max weight (in grams)'),
+              controller: _maxFood,
+              onChanged: (value) {
+                setState(() {
+                  widget.feeder.maxFoodLevel = int.parse(value);
+                });
+              },
+            ),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Water container max volume (in mililiters)'),
+              controller: _maxWater,
+              onChanged: (value) {
+                setState(() {
+                  widget.feeder.maxWaterLevel = int.parse(value);
                 });
               },
             ),
@@ -86,7 +108,7 @@ class _EditFeederDialogState extends State<EditFeederDialog> {
         TextButton(
           child: const Text('Save'),
           onPressed: () {
-            widget.onEdit(Feeder(widget.feeder.name, widget.feeder.description, newImageFile));
+            widget.onEdit(Feeder(widget.feeder.name, widget.feeder.description, newImageFile, widget.feeder.maxFoodLevel, widget.feeder.maxWaterLevel));
             Navigator.of(context).pop();
           },
         ),

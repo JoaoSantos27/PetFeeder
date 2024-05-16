@@ -4,15 +4,14 @@ class Feeder {
   String name;
   String description;
   File? imageFile; // Optional image file
-  double foodLevel; // Food level field
-  double waterLevel; // Water level field
+  int foodLevel; // Food level field
+  int waterLevel; // Water level field
   double timeInterval;
-  int foodAmount;
-
+  int foodAmount; // Amount of food in grams to drop each time
   // Maximum food and water levels (adjust as needed)
-  static const double maxFoodLevel = 100.0;
-  static const double maxWaterLevel = 100.0;
+  int maxFoodLevel; //In grams
+  int maxWaterLevel; //In mililiters
 
-  Feeder(this.name, this.description, this.imageFile, {this.foodLevel = 25.0, this.waterLevel = 65.0, this.timeInterval = 4, this.foodAmount = 200});
+  Feeder(this.name, this.description, this.imageFile, this.maxFoodLevel, this.maxWaterLevel, {this.foodLevel = 251, this.waterLevel = 800, this.timeInterval = 4, this.foodAmount = 200});
 
 }
