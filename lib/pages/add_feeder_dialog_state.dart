@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddFeederDialog extends StatefulWidget {
-  final void Function(String name, String description, File? image, int maxFood,
+  final void Function(String name, String description, String esp32, File? image, int maxFood,
       int maxWater) onAdd;
 
   const AddFeederDialog({Key? key, required this.onAdd}) : super(key: key);
@@ -16,6 +16,7 @@ class AddFeederDialog extends StatefulWidget {
 class _AddFeederDialogState extends State<AddFeederDialog> {
   String feederName = '';
   String feederDescription = '';
+  String feederESP32 = '';
   File? imageFile;
   int feederMaxFood = 0;
   int feederMaxWater = 0;
@@ -40,6 +41,14 @@ class _AddFeederDialogState extends State<AddFeederDialog> {
               onChanged: (value) {
                 setState(() {
                   feederDescription = value;
+                });
+              },
+            ),
+            TextField(
+              decoration: const InputDecoration(labelText: 'ESP32 atSign'),
+              onChanged: (value) {
+                setState(() {
+                  feederESP32 = value;
                 });
               },
             ),
@@ -104,7 +113,7 @@ class _AddFeederDialogState extends State<AddFeederDialog> {
         TextButton(
           child: const Text('Add'),
           onPressed: () {
-            widget.onAdd(feederName, feederDescription, imageFile,
+            widget.onAdd(feederName, feederDescription, feederESP32, imageFile,
                 feederMaxFood, feederMaxWater);
             Navigator.of(context).pop();
           },

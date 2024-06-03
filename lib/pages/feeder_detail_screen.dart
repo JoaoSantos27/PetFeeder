@@ -1,3 +1,4 @@
+import 'package:at_client_mobile/at_client_mobile.dart';
 import 'package:flutter/material.dart';
 
 import 'feeder.dart';
@@ -9,6 +10,32 @@ class FeederDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final AtClientManager atClientManager = AtClientManager.getInstance();
+    final AtClient atClient = atClientManager.atClient;
+    final String esp32 = feeder.esp32;
+    final String flutter = atClient.getCurrentAtSign()!;
+
+    // put key
+    // @esp32:num.soccer0@flutter
+    final AtKey sharedWithESP32 = AtKey()
+      ..sharedWith = esp32
+      ..key = 'num'
+      ..namespace = 'soccer0'
+      ..sharedBy = flutter
+    ;
+
+    // get key
+    // @flutter:num.soccer0@esp32
+    final AtKey sharedWithUs = AtKey()
+      ..sharedWith = flutter
+      ..key = 'num'
+      ..namespace = 'soccer0'
+      ..sharedBy = esp32
+    ;
+
+    //atClient.put(sharedWithESP32, "food amount: ${feeder.foodAmount}");
+
     // Calculate the percentage of food and water remaining
     double foodPercentage = feeder.foodLevel / feeder.maxFoodLevel;
     double waterPercentage = feeder.waterLevel / feeder.maxWaterLevel;
@@ -184,15 +211,26 @@ class FeederDetailScreen extends StatelessWidget {
               width: double.infinity,
               // Set width to fill the available space horizontally
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Handle the dispense food action here
                   // Show a confirmation snackbar
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Food dispensed'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
+                  bool success = await atClient.put(sharedWithESP32, 'dispense');
+                  if(success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Food dispensed'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Error occurred'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.green),

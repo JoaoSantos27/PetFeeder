@@ -17,6 +17,7 @@ class EditFeederDialog extends StatefulWidget {
 class _EditFeederDialogState extends State<EditFeederDialog> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
+  late TextEditingController _esp32Controller;
   late TextEditingController _maxFood;
   late TextEditingController _maxWater;
   late File? newImageFile;
@@ -26,6 +27,7 @@ class _EditFeederDialogState extends State<EditFeederDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.feeder.name);
     _descriptionController = TextEditingController(text: widget.feeder.description);
+    _esp32Controller = TextEditingController(text: widget.feeder.esp32);
     _maxFood = TextEditingController(text: widget.feeder.maxFoodLevel.toString());
     _maxWater = TextEditingController(text: widget.feeder.maxWaterLevel.toString());
     newImageFile = widget.feeder.imageFile;
@@ -53,6 +55,15 @@ class _EditFeederDialogState extends State<EditFeederDialog> {
               onChanged: (value) {
                 setState(() {
                   widget.feeder.description = value;
+                });
+              },
+            ),
+            TextField(
+              decoration: const InputDecoration(labelText: 'ESP32 atSign'),
+              controller: _esp32Controller,
+              onChanged: (value) {
+                setState(() {
+                  widget.feeder.esp32 = value;
                 });
               },
             ),
@@ -108,7 +119,7 @@ class _EditFeederDialogState extends State<EditFeederDialog> {
         TextButton(
           child: const Text('Save'),
           onPressed: () {
-            widget.onEdit(Feeder(widget.feeder.name, widget.feeder.description, newImageFile, widget.feeder.maxFoodLevel, widget.feeder.maxWaterLevel));
+            widget.onEdit(Feeder(widget.feeder.name, widget.feeder.description, widget.feeder.esp32, newImageFile, widget.feeder.maxFoodLevel, widget.feeder.maxWaterLevel));
             Navigator.of(context).pop();
           },
         ),
