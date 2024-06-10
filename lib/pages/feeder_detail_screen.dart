@@ -3,22 +3,38 @@ import 'package:flutter/material.dart';
 
 import 'feeder.dart';
 
-class FeederDetailScreen extends StatelessWidget {
+class FeederDetailScreen extends StatefulWidget {
   final Feeder feeder;
 
   const FeederDetailScreen({super.key, required this.feeder});
 
   @override
-  Widget build(BuildContext context) {
+  _FeederDetailScreenState createState() => _FeederDetailScreenState();
+}
 
-    final AtClientManager atClientManager = AtClientManager.getInstance();
-    final AtClient atClient = atClientManager.atClient;
-    final String esp32 = feeder.esp32;
-    final String flutter = atClient.getCurrentAtSign()!;
+class _FeederDetailScreenState extends State<FeederDetailScreen> {
+  late Feeder feeder;
+  late AtClientManager atClientManager;
+  late AtClient atClient;
+  late String esp32;
+  late String flutter;
+
+  late AtKey sharedWithESP32;
+  late AtKey sharedWithUs;
+
+
+  @override
+  void initState() {
+    super.initState();
+    feeder = widget.feeder;
+    atClientManager = AtClientManager.getInstance();
+    atClient = atClientManager.atClient;
+    esp32 = feeder.esp32;
+    flutter = atClient.getCurrentAtSign()!;
 
     // put key
     // @esp32:num.soccer0@flutter
-    final AtKey sharedWithESP32 = AtKey()
+    sharedWithESP32 = AtKey()
       ..sharedWith = esp32
       ..key = 'num'
       ..namespace = 'soccer0'
@@ -27,25 +43,62 @@ class FeederDetailScreen extends StatelessWidget {
 
     // get key
     // @flutter:num.soccer0@esp32
-    final AtKey sharedWithUs = AtKey()
+    sharedWithUs = AtKey()
       ..sharedWith = flutter
       ..key = 'num'
       ..namespace = 'soccer0'
       ..sharedBy = esp32
     ;
+    receiveESPData();
+  }
 
-    //atClient.put(sharedWithESP32, "food amount: ${feeder.foodAmount}");
+
+  void receiveESPData() async {
+    while (true) {
+      try {
+        String? token = (await atClient.get(sharedWithUs)).value;
+        if (token != null) {
+          List<String> data = token.split(":");
+          if (data.length == 2) {
+            setState(() {
+              switch (data.first) {
+                case "maxFoodLevel":
+                  feeder.maxFoodLevel = int.parse(data.last);
+                  break;
+                case "foodLevel":
+                  feeder.foodLevel = int.parse(data.last);
+                  break;
+                default:
+                  break;
+              }
+            });
+          }
+        }
+      } catch (e) {
+        print("Error receiving data: $e");
+      }
+      await Future.delayed(const Duration(seconds: 5)); // Delay to prevent tight loop
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     // Calculate the percentage of food and water remaining
-    double foodPercentage = feeder.foodLevel / feeder.maxFoodLevel;
-    double waterPercentage = feeder.waterLevel / feeder.maxWaterLevel;
+    double foodPercentage;
+    if(feeder.maxFoodLevel == 0) {
+      foodPercentage = feeder.foodLevel / 1;
+    } else {
+      foodPercentage = feeder.foodLevel / feeder.maxFoodLevel;
+    }
+    //double waterPercentage = feeder.waterLevel / feeder.maxWaterLevel;
 
     double newTimeInterval = feeder.timeInterval;
     int newFoodAmount = feeder.foodAmount;
 
     // Determine the color of the progress indicators based on the percentage
     Color foodColor = _getProgressColor(foodPercentage);
-    Color waterColor = _getProgressColor(waterPercentage);
+    //Color waterColor = _getProgressColor(waterPercentage);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
@@ -111,11 +164,11 @@ class FeederDetailScreen extends StatelessWidget {
             // Food level indicator
             _buildLevelIndicator(
                 'Food Container Level', foodPercentage, foodColor, feeder.maxFoodLevel, 'grams'),
-            const SizedBox(height: 10),
+            /*const SizedBox(height: 10),
             // Add some spacing between the indicators
             // Water level indicator
             _buildLevelIndicator(
-                'Water Container Level', waterPercentage, waterColor, feeder.maxWaterLevel, 'mililiters'),
+                'Water Container Level', waterPercentage, waterColor, feeder.maxWaterLevel, 'mililiters'),*/
             const SizedBox(height: 20),
             // Add space between the indicators and the button
             // Button to dispense food
@@ -141,17 +194,27 @@ class FeederDetailScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 // Add a button to confirm and set the time interval
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     // Update the feeder's time interval when the button is pressed
                     feeder.timeInterval = newTimeInterval;
-                    // Show a confirmation snackbar
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            'Feeding time interval set to $newTimeInterval hours'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+                    bool success = await atClient.put(sharedWithESP32, ('timeInterval:%d', feeder.timeInterval));
+                    if(success) {
+                      // Show a confirmation snackbar
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Feeding time interval set to $newTimeInterval hours'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Error occurred'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.green),
@@ -184,17 +247,27 @@ class FeederDetailScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 // Add a button to confirm and set the time interval
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     // Update the feeder's time interval when the button is pressed
                     feeder.foodAmount = newFoodAmount;
-                    // Show a confirmation snackbar
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content:
-                            Text('Food amount set to $newFoodAmount grams'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+                    bool success = await atClient.put(sharedWithESP32, ('foodAmount:%d', feeder.foodAmount));
+                    if(success) {
+                      // Show a confirmation snackbar
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content:
+                          Text('Food amount set to $newFoodAmount grams'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Error occurred'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.green),
